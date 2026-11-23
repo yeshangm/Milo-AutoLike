@@ -1,0 +1,47 @@
+
+name: Build Milo AutoLike APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "*.zip"
+      - ".github/workflows/android.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK      - 名称: 设置 Android SDK
+        uses: android-actions/setup-android@v3使用: android-actions/setup-android@v3
+
+      - name: Set up Gradle      - 名称: 设置 Gradle - 名称: 设置 Gradle
+        uses: gradle/actions/setup-gradle@v4使用: ggradle/actions/setup-gradle@v4使用: gradle/actions/setup-gradle@v4使用: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Extract project
+        run: |运行: |
+          mkdir source创建 source 目录
+          unzip -q *.zip -d source
+          PROJECT_DIR=$(dirname "$(find source -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Build APK      - name: 构建APK
+        run: gradle -p "$PROJECT_DIR" assembleDebug
+
+      - name: Upload APK      - name: 上传APK
+        uses: actions/upload-artifact@v4用途: actions/upload-artifact@v4
+        with:
+          name: Milo-AutoLike-APK
+          path: "**/build/outputs/apk/debug/*.apk"路径: "**/build/outputs/apk/debug/*.apk"
