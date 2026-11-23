@@ -22,26 +22,26 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK      - 名称: 设置 Android SDK
-        uses: android-actions/setup-android@v3使用: android-actions/setup-android@v3
-
-      - name: Set up Gradle      - 名称: 设置 Gradle - 名称: 设置 Gradle
-        uses: gradle/actions/setup-gradle@v4使用: ggradle/actions/setup-gradle@v4使用: gradle/actions/setup-gradle@v4使用: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.9"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Extract project
-        run: |运行: |
-          mkdir source创建 source 目录
+        run: |
+          mkdir source
           unzip -q *.zip -d source
-          PROJECT_DIR=$(dirname "$(find source -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          find source -name settings.gradle -o -name settings.gradle.kts
 
-      - name: Build APK      - name: 构建APK
-        run: gradle -p "$PROJECT_DIR" assembleDebug
+      - name: Build APK
+        run: |
+          PROJECT_FILE=$(find source -name settings.gradle -o -name settings.gradle.kts | head -n 1)
+          PROJECT_DIR=$(dirname "$PROJECT_FILE")
+          cd "$PROJECT_DIR"
+          gradle wrapper --gradle-version 8.9
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-      - name: Upload APK      - name: 上传APK
-        uses: actions/upload-artifact@v4用途: actions/upload-artifact@v4
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: Milo-AutoLike-APK
-          path: "**/build/outputs/apk/debug/*.apk"路径: "**/build/outputs/apk/debug/*.apk"
+          path: "source/**/build/outputs/apk/debug/*.apk"
